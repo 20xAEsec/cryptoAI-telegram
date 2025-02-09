@@ -46,5 +46,5 @@ This repository contains the backend code for an advanced Telegram bot that perf
 ### Setup
 Clone the repository:
 ```bash
-git clone https://github.com/yourusername/telegram-call-bot-crypto-token-analysis.git
-cd telegram-call-bot-crypto-token-analysis
+git clone https://github.com/20xAEsec/cryptoAI-telegram
+cd cryptoAI-telegram

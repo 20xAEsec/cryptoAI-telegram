@@ -48,3 +48,15 @@ Clone the repository:
 ```bash
 git clone https://github.com/20xAEsec/cryptoAI-telegram
 cd cryptoAI-telegram
+```
+### Configuration
+Sensitive credentials are retrieved via environment variables in accordance with secure programming practices.
+See .env file for sample configuration
+
+Credential Retrieval
+```python
+from dotenv import load_dotenv
+load_dotenv()
+chat_id = os.getenv("ALGORA_BOT_USERID") 
+user_id = os.getenv("MY_USER_ID")
+```

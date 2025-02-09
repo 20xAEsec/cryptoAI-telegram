@@ -1,0 +1,50 @@
+# Telegram Call Bot: Crypto Token Analysis
+
+## Overview
+This repository contains the backend code for an advanced Telegram bot that performs in-depth analysis on crypto tokens. The bot leverages technical analysis, on-chain data, and social sentiment to provide users with actionable insights into token trading opportunities—especially for meme tokens. By accepting a token contract address from various blockchain networks, the bot extracts relevant data, queries external APIs (like CoinGecko), and returns comprehensive token information.
+
+## Features
+
+- **Multi-Blockchain Token Detection:**  
+  The system supports a wide range of blockchain networks by using regex patterns to detect valid contract addresses. Supported formats include:
+  - **EVM-Compatible Tokens:**  
+    Addresses starting with `0x` (Ethereum, Binance Smart Chain, Polygon, etc.).
+  - **Pumpfun Tokens:**  
+    Custom tokens with addresses starting with `PF` (assumed format).
+  - **Tezos Contracts:**  
+    Addresses starting with `KT1` followed by 33 Base58 characters.
+  - **Tron Addresses:**  
+    Addresses starting with `T` followed by 33 Base58 characters.
+  - **Cardano Addresses:**  
+    Addresses starting with `addr1` or `addr_test1` followed by at least 38 lowercase alphanumerics.
+  - **Polkadot/Substrate Addresses:**  
+    Base58 addresses with a length of 47–48 characters.
+  - **Solana Addresses:**  
+    Base58 addresses with a length of 32–44 characters.
+
+- **CoinGecko API Integration:**  
+  After detecting the token’s blockchain, the system maps the token to the corresponding CoinGecko platform identifier and queries the CoinGecko API for detailed token data. The returned data includes:
+  - Market metrics (current price, market cap, liquidity, volume)
+  - Tokenomics (total and circulating supply)
+  - Community data (social sentiment, community engagement)
+  - Developer activity and project fundamentals
+
+- **Robust Error Handling:**  
+  The functions are designed to return clear error messages if a token isn’t found, if there’s an API error, or if the provided input doesn’t contain a valid contract address.
+
+- **Modular & Extendable:**  
+  Key functions such as `find_coin_info` and `get_token_info` are modular. This design makes it straightforward to integrate the functionality into a larger Telegram bot system and to extend support for additional blockchain platforms in the future.
+
+## Installation
+
+### Prerequisites
+- Python 3.7 or higher
+- The following Python libraries:
+  - `requests` (for making HTTP requests)
+  - Standard Python modules: `re`, `json`
+
+### Setup
+Clone the repository:
+```bash
+git clone https://github.com/yourusername/telegram-call-bot-crypto-token-analysis.git
+cd telegram-call-bot-crypto-token-analysis

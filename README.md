@@ -53,7 +53,10 @@ cd cryptoAI-telegram
 Sensitive credentials are retrieved via environment variables in accordance with secure programming practices.
 See .env file for sample configuration
 
-Credential Retrieval
+#### Credential Setting    
+Refer to '.env' for credential setting example.   
+   
+#### Credential Retrieval -
 ```python
 from dotenv import load_dotenv
 load_dotenv()

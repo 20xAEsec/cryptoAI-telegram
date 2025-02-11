@@ -54,7 +54,11 @@ async def call_chatgpt(prompt: str) -> str:
         
         token_name = token_info["name"]
         token_platform = token_info["asset_platform_platform"]
+
+
         print(print("TOKEN DATA FOUND AND RETRIEVED - CoinGecko data in prompt"))
+
+        # Strip international data from JSON elements, leaving only usd/en information
         token_info["market_data"]["current_price"] = token_info["market_data"]["current_price"]["usd"]
         token_info["market_data"]["ath"] = token_info["market_data"]["ath"]["usd"]
         token_info["market_data"]["ath_date"] = token_info["market_data"]["ath_date"]["usd"]

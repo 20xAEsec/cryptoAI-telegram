@@ -40,37 +40,105 @@ async def call_chatgpt(prompt: str) -> str:
     """
 
     token_info = coin_info.get_token_info(prompt)
+    
+    system_prompt = """"
+    You are an expert cryptocurrency trader and technical analyst. "
+        "You have comprehensive knowledge of on-chain metrics, volume, price data, "
+        "and market trends. Your task is to analyze the provided token data, "
+        "assess metrics such as trading volume, liquidity, price trends, and risk factors, "
+        "and then provide a detailed technical analysis along with a recommendation "
+        "on whether the token is a good buy.
+        """
     #print(str(token_info))
     if token_info:
-        compact_token_info = json.dumps(token_info, separators=(',', ':'))
+        
+        token_name = token_info["name"]
+        token_platform = token_info["asset_platform_platform"]
+        print(print("TOKEN DATA FOUND AND RETRIEVED - CoinGecko data in prompt"))
+        token_info["market_data"]["current_price"] = token_info["market_data"]["current_price"]["usd"]
+        token_info["market_data"]["ath"] = token_info["market_data"]["ath"]["usd"]
+        token_info["market_data"]["ath_date"] = token_info["market_data"]["ath_date"]["usd"]
+        token_info["market_data"]["atl"] = token_info["market_data"]["atl"]["usd"]
+        token_info["description"] = token_info["description"]["en"]
+        token_info["localization"] = token_info["localization"]["en"]
+        token_info["market_data"]["ath_change_percentage"] = token_info["market_data"]["ath_change_percentage"]["usd"]
+        token_info["market_data"]["high_24h"] = token_info["market_data"]["high_24h"]["usd"]
+        token_info["market_data"]["low_24h"] = token_info["market_data"]["low_24h"]["usd"]
+        token_info["tickers"] = token_info["tickers"][0:5]
+
         # write the token info to a file in a format that is easy to read with indentation
         with open("token_info.json", "w") as outfile:
             json.dump(token_info, outfile, indent=4)
-        print("TOKEN FOUND - CoinGecko data in prompt")
+            
+
         full_prompt = (
-            "This is a message from a Telegram bot that calls out specific meme coins that are about to pop off.\n"
-            "Use the content to provide an in-depth analysis of the meme coin being called out, performing your own research of the trading metrics.\n"
-            "Generate a response that is informative and technical to the users in the group chat.\n"
-            "Structure your response in a visually easy-to-read format that provides value.\n"
-            "Keep your response concise and to the point, avoiding unnecessary fluff.\n"
-            "Message below:\n" + prompt +
-            "\nIn addition, provide an in-depth analysis of the provided data on this token, and provide a prediction on the token's future price movement, and wether this is a good investment currently.\n"        
-            "I will provide the coin info in Base64 format. Decode the data and use the resulting information for your analysis\n"
-            "Coin info from CoinGecko API: + \n" + str(compact_token_info)
+            """You are an expert financial analyst specializing in cryptocurrency markets. You are receiving calls in a Telegram channel on crypto tokens that need to be analyzed. 
+              The contract address is extracted from the message to query the CoinGecko API and provide you with the results on the token data.
+              Please perform a highly detailed and in-depth analysis of the  using the data provided. Only consider the data points pertaining to the price and market data of the token in your analysis.
+
+            Your analysis should include:
+
+            1. **Summary of Key Metrics:**  
+            - Identify and list the most important metrics from the JSON token data(e.g., current price, volume, market cap, technical indicators, trend signals, etc.).
+            - Explain briefly what each metric means in the context of crypto token performance.
+
+            2. **Detailed Analysis:**  
+            - For each key metric, discuss its current value, historical context (if provided), and what it might indicate about the token’s performance.
+            - Analyze any patterns or anomalies. For example, if there is a significant change in volume or price, discuss potential causes and implications.
+            - Evaluate the token's technical signals (such as support/resistance levels, trend lines, moving averages, RSI, MACD, etc.) and explain how they contribute to your overall conclusion.
+
+            3. **Comparative Insights and Conclusion:**  
+            - Based on the metrics, provide an overall assessment of the token’s current state and potential future performance.
+            - Explain your reasoning step-by-step, showing how the data supports the conclusion you reach.
+            - Include any potential risks or red flags indicated by the data.
+            - Conclude with a summary statement that clearly outlines your overall findings.
+
+            4. **Transparency in Reasoning:**  
+            - Ensure that your analysis is comprehensive and shows exactly how each data point influenced your conclusion.
+            - Use clear, technical language suitable for an audience familiar with crypto markets, while ensuring that each point is well-explained.
+
+            Do not reflect the data used in your analysis in your response. Here is the JSON token data:
+
+            {token_info}
+
+            "Here is the Telegram message that calls out the token to be analyzed:\n" + {prompt} +
+        """
         )
     else:
+        print("Sending prompt without CoinGecko data")
         full_prompt = (
-            "This is a message from a Telegram bot that calls out specific meme coins that are about to pop off.\n"
-            "Use the content to provide an in-depth analysis of the meme coin being called out, performing your own research of the trading metrics.\n"
-            "Generate a response that is informative and engaging to the users in the group chat.\n"
-            "Structure your response in a visually easy-to-read format that provides value.\n"
-            "Keep your response concise and to the point, avoiding unnecessary fluff.\n"
-            "Message below:\n" + prompt
+            """You are an expert financial analyst specializing in cryptocurrency markets. Please perform a highly detailed and in-depth analysis of this token using the data provided. 
+
+            Your analysis should include:
+
+            1. **Summary of Key Metrics:**  
+            - Explain briefly what each metric means in the context of crypto token performance.
+
+            2. **Detailed Analysis:**  
+            - For each key metric, discuss its current value, historical context (if provided), and what it might indicate about the token’s performance.
+            - Analyze any patterns or anomalies. For example, if there is a significant change in volume or price, discuss potential causes and implications.
+            - Evaluate the token's technical signals (such as support/resistance levels, trend lines, moving averages, RSI, MACD, etc.) and explain how they contribute to your overall conclusion.
+
+            3. **Comparative Insights and Conclusion:**  
+            - Based on the metrics, provide an overall assessment of the token’s current state and potential future performance.
+            - Explain your reasoning step-by-step, showing how the data supports the conclusion you reach.
+            - Include any potential risks or red flags indicated by the data.
+            - Conclude with a summary statement that clearly outlines your overall findings.
+
+            4. **Transparency in Reasoning:**  
+            - Ensure that your analysis is comprehensive and shows exactly how each data point influenced your conclusion.
+            - Use clear, technical language suitable for an audience familiar with crypto markets, while ensuring that each point is well-explained.
+            "Message below:\n" + {prompt}
+        """
         )
 
-    #print(str(full_prompt))
+
     chat_completion = gpt_client.chat.completions.create(
     messages=[
+         {
+            "role": "user",
+            "content": system_prompt,
+        },
         {
             "role": "user",
             "content": full_prompt,

@@ -32,7 +32,7 @@ def get_token_info(text: str):
         "polkadot": r'\b[1-9A-HJ-NP-Za-km-z]{47,48}\b',       # Polkadot/Substrate
         "solana":   r'\b[1-9A-HJ-NP-Za-km-z]{32,44}\b'         # Solana
     }
-    
+    data = None
     detected_platform = None
     contract_address = None
     
@@ -46,8 +46,8 @@ def get_token_info(text: str):
             break
     
     if not contract_address:
-        print("error - No valid contract address found in the input text.")
-        return False
+        print(f"========\nerror - No valid contract address found in the input text.\n Input Text - {text}\n========")
+        return None
     
     # Map the detected platform to CoinGecko's expected platform identifier.
     platform_mapping = {
@@ -62,7 +62,7 @@ def get_token_info(text: str):
     
     if detected_platform not in platform_mapping:
         print("PLATFORM NOT SUPPORTED")
-        return False
+        return None
     
     coingecko_platform = platform_mapping[detected_platform]
     
@@ -74,19 +74,80 @@ def get_token_info(text: str):
         response = requests.get(api_url)
         if response.status_code != 200:
             print( "error - Token not found or API error")
-            return False
+            return None
         data = response.json()
         return data
     except Exception as e:
         print( {"error": str(e)})
-        return False
+        return None
 
-# Example usage:
-if __name__ == "__main__":
-    sample_text = (
-        "Here is a Pumpfun token address: PF1234567890abcdef1234567890ABCDEF12345678. "
-        "This string should trigger the Pumpfun branch and query CoinGecko accordingly."
-    )
+def get_contract_address(token_name: str, blockchain: str) -> str:
+    """
+    Given a token's name and a blockchain (e.g., "ethereum", "binance-smart-chain"),
+    queries the CoinGecko API and returns the token's contract address.
+
+    Args:
+        token_name (str): The name of the token to search for.
+        blockchain (str): The blockchain for which to retrieve the contract address.
     
-    token_info = get_token_info(sample_text)
-    print(json.dumps(token_info, indent=2))
+    Returns:
+        str: The contract address if found, otherwise None.
+    """
+    # Step 1: Search for the token using the CoinGecko search endpoint.
+    search_url = "https://api.coingecko.com/api/v3/search"
+    params = {"query": token_name}
+    response = requests.get(search_url, params=params)
+    if response.status_code != 200:
+        print(f"Error: Search API request failed with status code {response.status_code}")
+        return None
+
+    search_data = response.json()
+    coins = search_data.get("coins", [])
+    if not coins:
+        print(f"No coins found for token name: {token_name}")
+        return None
+
+    # Attempt to find an exact match by name (case-insensitive), or use the first result.
+    coin_id = None
+    for coin in coins:
+        if coin.get("name", "").lower() == token_name.lower():
+            coin_id = coin.get("id")
+            break
+    if coin_id is None:
+        coin_id = coins[0].get("id")
+    
+    # Step 2: Retrieve detailed coin information to access the platforms data.
+    details_url = f"https://api.coingecko.com/api/v3/coins/{coin_id}"
+    # Limit data to only what we need to reduce payload.
+    details_params = {
+        "localization": "false",
+        "tickers": "false",
+        "market_data": "false",
+        "community_data": "false",
+        "developer_data": "false",
+        "sparkline": "false"
+    }
+    details_response = requests.get(details_url, params=details_params)
+    if details_response.status_code != 200:
+        print(f"Error: Details API request failed with status code {details_response.status_code}")
+        return None
+
+    details_data = details_response.json()
+    platforms = details_data.get("platforms", {})
+
+    # Step 3: Extract the contract address for the specified blockchain.
+    # The blockchain keys are typically in lowercase.
+    contract_address = platforms.get(blockchain.lower())
+    if not contract_address:
+        print(f"No contract address found for blockchain: {blockchain}")
+        return None
+
+    return contract_address
+
+# token_name = "LOFI"
+# blockchain = "SUI"
+# address = get_contract_address(token_name, blockchain)
+# if address:
+#     print(f"Contract address for {token_name} on {blockchain}: {address}")
+# else:
+#     print("Contract address not found.")

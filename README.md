@@ -5,6 +5,12 @@
 ## Overview
 This repository contains the backend code for an advanced Telegram bot that performs in-depth analysis on crypto tokens. The bot leverages technical analysis, on-chain data, and social sentiment to provide users with actionable insights into token trading opportunities—especially for meme tokens. By accepting a token contract address from various blockchain networks, the bot extracts relevant data, queries external APIs (like CoinGecko), and returns comprehensive token information.
 
+#### Credential Setting    
+Credentials are stored in the .env file, to be referenced using the dotenv Python library.  
+Credentials should never be hardcoded and should be dynamically retrieved using a cloud-based secrets manager, when possible.  
+For simplicity's sake, storing secrets in an environment variable will suffice, assuming the system is protected from unauthorized access.
+When contributing to this codebase, ensure your local .env file has been added to .gitignore.
+
 ## Features
 
 - **Multi-Blockchain Token Detection:**  
@@ -55,8 +61,6 @@ cd cryptoAI-telegram
 Sensitive credentials are retrieved via environment variables in accordance with secure programming practices.
 See .env file for sample configuration
 
-#### Credential Setting    
-Refer to '.env' for credential setting example.   
    
 #### Credential Retrieval -
 ```python

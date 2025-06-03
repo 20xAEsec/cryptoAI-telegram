@@ -1,7 +1,7 @@
 # Telegram Call Bot: Crypto Token Analysis
 
-##### Note - work in progress, bugs expected.  
-Working out real-time ChatGPT response streaming into Telegram message.
+##### Note - Work in progress, bugs expected.  
+##### Working out real-time ChatGPT response streaming into Telegram message.
 
 ## Overview
 This repository contains the backend code for an advanced Telegram bot that performs in-depth analysis on crypto tokens. The bot leverages technical analysis, on-chain data, and social sentiment to provide users with actionable insights into token trading opportunities—especially for meme tokens. By accepting a token contract address from various blockchain networks, the bot extracts relevant data, queries external APIs (like CoinGecko), and returns comprehensive token information.
